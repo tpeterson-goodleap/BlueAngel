@@ -1,84 +1,349 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Blue Angel — Digital Comic Beta</title>
-<style>
-:root{
-  --bg:#030405;
-  --panel:#0b0c0f;
-  --line:rgba(72,160,255,.35);
-  --text:#f3efe5;
-  --muted:#a9a39a;
-  --blue:#1c86ff;
-  --gold:#b58b44;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;background:var(--bg)}
-body{margin:0;background:radial-gradient(circle at top center, #092144 0, #020307 45%, #000 100%);color:var(--text);font-family:Georgia, 'Times New Roman', serif;}
-.toolbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:rgba(0,0,0,.84);backdrop-filter: blur(8px);border-bottom:1px solid var(--line);}
-.brand{letter-spacing:.16em;text-transform:uppercase;font-size:14px;color:#e6d4ad;white-space:nowrap}
-.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-button,a.btn{appearance:none;border:1px solid rgba(60,145,255,.55);background:rgba(10,20,35,.85);color:var(--text);border-radius:999px;padding:7px 12px;font:14px/1.2 system-ui, -apple-system, Segoe UI, sans-serif;cursor:pointer;text-decoration:none}
-button:hover,a.btn:hover{background:rgba(20,52,92,.95)}
-.counter{font:13px/1.2 system-ui, -apple-system, Segoe UI, sans-serif;color:var(--muted);min-width:80px;text-align:center}
-.reader{width:100%;padding:18px 12px 44px;}
-.page{width:min(96vw,1440px);margin:0 auto 26px;aspect-ratio:3/2;background:#000;border:1px solid rgba(181,139,68,.45);box-shadow:0 20px 60px rgba(0,0,0,.65), 0 0 40px rgba(0,85,255,.08);display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.page img{width:100%;height:100%;object-fit:contain;display:block;background:#000;}
-.caption{text-align:center;margin:-14px auto 30px;color:var(--muted);font:12px/1.3 system-ui, -apple-system, Segoe UI, sans-serif;letter-spacing:.08em;text-transform:uppercase;}
-.single .reader{min-height:calc(100vh - 52px);display:grid;place-items:center;padding:14px 10px 22px;}
-.single .page{display:none;margin:0;max-height:calc(100vh - 86px);width:min(96vw, calc((100vh - 86px) * 1.5));}
-.single .page.active{display:flex;}
-.single .caption{display:none}
-.footer{color:var(--muted);text-align:center;padding:20px 12px 36px;font:12px/1.5 system-ui, -apple-system, Segoe UI, sans-serif;}
-@media (max-width:700px){.toolbar{align-items:flex-start;flex-direction:column}.brand{font-size:12px}.controls{justify-content:flex-start}.page{width:100vw;border-left:0;border-right:0;margin-bottom:18px}.reader{padding-left:0;padding-right:0}}
-@media print{.toolbar,.caption,.footer{display:none}.reader{padding:0}.page{page-break-after:always;margin:0;width:100vw;box-shadow:none;border:0}}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blue Angel — Digital Comic</title>
+  <style>
+    :root {
+      --bg: #05070b;
+      --panel: rgba(8, 10, 16, 0.82);
+      --line: rgba(55, 145, 255, 0.32);
+      --text: #f4efe6;
+      --muted: #9fb0c8;
+      --blue: #1688ff;
+      --gold: #b9853a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 80% 10%, rgba(18, 100, 255, 0.16), transparent 36%),
+        radial-gradient(circle at 20% 90%, rgba(185, 133, 58, 0.10), transparent 32%),
+        var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+      overflow: hidden;
+    }
+
+    body {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    header {
+      min-height: 58px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      background: linear-gradient(180deg, rgba(0,0,0,.82), rgba(0,0,0,.48));
+      border-bottom: 1px solid var(--line);
+      user-select: none;
+      z-index: 5;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.05;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .brand strong {
+      font-size: 18px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .brand span {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: .2em;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+    }
+
+    button {
+      border: 1px solid rgba(255,255,255,.18);
+      background: var(--panel);
+      color: var(--text);
+      padding: 9px 13px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: rgba(22,136,255,.72);
+      background: rgba(18, 35, 65, 0.88);
+    }
+
+    button:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+    }
+
+    .counter {
+      min-width: 92px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+    }
+
+    main {
+      position: relative;
+      display: grid;
+      place-items: center;
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    .page-frame {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+    }
+
+    img#comicPage {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border: 1px solid rgba(185, 133, 58, 0.34);
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,.9),
+        0 18px 60px rgba(0,0,0,.58),
+        0 0 42px rgba(22, 136, 255, .10);
+      background: #000;
+    }
+
+    .page-title {
+      position: absolute;
+      left: 18px;
+      bottom: 16px;
+      padding: 7px 11px;
+      border: 1px solid rgba(185, 133, 58, 0.35);
+      background: rgba(0,0,0,.58);
+      color: rgba(244, 239, 230, .82);
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      pointer-events: none;
+      user-select: none;
+      backdrop-filter: blur(6px);
+    }
+
+    footer {
+      min-height: 42px;
+      padding: 8px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+      background: linear-gradient(0deg, rgba(0,0,0,.80), rgba(0,0,0,.36));
+      border-top: 1px solid var(--line);
+      user-select: none;
+    }
+
+    .progress {
+      width: min(420px, 52vw);
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      overflow: hidden;
+    }
+
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--blue), var(--gold));
+      transition: width .18s ease;
+    }
+
+    .hint {
+      opacity: .8;
+    }
+
+    @media (max-width: 720px) {
+      header {
+        padding: 8px 10px;
+      }
+
+      .brand strong {
+        font-size: 14px;
+      }
+
+      .brand span {
+        display: none;
+      }
+
+      .controls {
+        gap: 6px;
+      }
+
+      button {
+        padding: 8px 10px;
+        font-size: 13px;
+      }
+
+      .counter {
+        min-width: 70px;
+        font-size: 12px;
+      }
+
+      main {
+        padding: 8px;
+      }
+
+      footer {
+        padding: 6px 10px;
+        gap: 8px;
+      }
+
+      .hint {
+        display: none;
+      }
+
+      .progress {
+        width: 72vw;
+      }
+
+      .page-title {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
-<header class="toolbar">
-  <div class="brand">Blue Angel · Digital Comic Beta</div>
-  <div class="controls">
-    <button id="prevBtn" type="button">Prev</button>
-    <span id="counter" class="counter">1 / 13</span>
-    <button id="nextBtn" type="button">Next</button>
-    <button id="modeBtn" type="button">Page mode</button>
-    <a class="btn" href="#page-01">Top</a>
-  </div>
-</header>
-<main class="reader">
-<section id="page-01" class="page active" aria-label="Cover"><img src="assets/00_Cover.png" alt="Blue Angel — Cover" loading="eager"></section><div class="caption">01 · Cover</div><section id="page-02" class="page " aria-label="Inside Title"><img src="assets/01_Inside_Title.png" alt="Blue Angel — Inside Title" loading="eager"></section><div class="caption">02 · Inside Title</div><section id="page-03" class="page " aria-label="Page 01"><img src="assets/02_Page_01.png" alt="Blue Angel — Page 01" loading="lazy"></section><div class="caption">03 · Page 01</div><section id="page-04" class="page " aria-label="Page 02"><img src="assets/03_Page_02.png" alt="Blue Angel — Page 02" loading="lazy"></section><div class="caption">04 · Page 02</div><section id="page-05" class="page " aria-label="Page 03"><img src="assets/04_Page_03.png" alt="Blue Angel — Page 03" loading="lazy"></section><div class="caption">05 · Page 03</div><section id="page-06" class="page " aria-label="Page 04"><img src="assets/05_Page_04.png" alt="Blue Angel — Page 04" loading="lazy"></section><div class="caption">06 · Page 04</div><section id="page-07" class="page " aria-label="Page 05"><img src="assets/06_Page_05.png" alt="Blue Angel — Page 05" loading="lazy"></section><div class="caption">07 · Page 05</div><section id="page-08" class="page " aria-label="Page 06"><img src="assets/07_Page_06.png" alt="Blue Angel — Page 06" loading="lazy"></section><div class="caption">08 · Page 06</div><section id="page-09" class="page " aria-label="Page 07"><img src="assets/08_Page_07.png" alt="Blue Angel — Page 07" loading="lazy"></section><div class="caption">09 · Page 07</div><section id="page-10" class="page " aria-label="Page 08"><img src="assets/09_Page_08.png" alt="Blue Angel — Page 08" loading="lazy"></section><div class="caption">10 · Page 08</div><section id="page-11" class="page " aria-label="Page 09"><img src="assets/10_Page_09.png" alt="Blue Angel — Page 09" loading="lazy"></section><div class="caption">11 · Page 09</div><section id="page-12" class="page " aria-label="Page 10"><img src="assets/11_Page_10.png" alt="Blue Angel — Page 10" loading="lazy"></section><div class="caption">12 · Page 10</div><section id="page-13" class="page " aria-label="End Card"><img src="assets/12_End_Card.png" alt="Blue Angel — End Card" loading="lazy"></section><div class="caption">13 · End Card</div>
-</main>
-<div class="footer">Written by Tristan Peterson · Art Direction / Visual Production: Tristan Peterson / ChatGPT</div>
-<script>
-const pages = Array.from(document.querySelectorAll('.page'));
-let current = 0;
-const counter = document.getElementById('counter');
-const modeBtn = document.getElementById('modeBtn');
-function update(){
-  pages.forEach((p,i)=>p.classList.toggle('active', i===current));
-  counter.textContent = `${current+1} / ${pages.length}`;
-  if(document.body.classList.contains('single')) history.replaceState(null,'',`#page-${String(current+1).padStart(2,'0')}`);
-}
-function go(delta){current = Math.max(0, Math.min(pages.length-1, current+delta)); update();}
-function setMode(single){
-  document.body.classList.toggle('single', single);
-  modeBtn.textContent = single ? 'Scroll mode' : 'Page mode';
-  update();
-  if(!single) pages[current].scrollIntoView({behavior:'smooth', block:'start'});
-}
-modeBtn.addEventListener('click',()=>setMode(!document.body.classList.contains('single')));
-document.getElementById('prevBtn').addEventListener('click',()=>go(-1));
-document.getElementById('nextBtn').addEventListener('click',()=>go(1));
-document.addEventListener('keydown',e=>{
-  if(e.key==='ArrowRight' || e.key==='PageDown') go(1);
-  if(e.key==='ArrowLeft' || e.key==='PageUp') go(-1);
-  if(e.key.toLowerCase()==='f') document.documentElement.requestFullscreen?.();
-});
-const match = location.hash.match(/page-(\d+)/);
-if(match) current = Math.min(pages.length-1, Math.max(0, parseInt(match[1],10)-1));
-update();
-</script>
+  <header>
+    <div class="brand">
+      <strong>Blue Angel</strong>
+      <span>A Gemfire Comics Story</span>
+    </div>
+
+    <div class="controls" aria-label="Comic navigation">
+      <button id="firstBtn" type="button" title="First page">First</button>
+      <button id="prevBtn" type="button" title="Previous page">Prev</button>
+      <div id="counter" class="counter">Page 1 / 13</div>
+      <button id="nextBtn" type="button" title="Next page">Next</button>
+      <button id="lastBtn" type="button" title="Last page">Last</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-frame">
+      <img id="comicPage" src="" alt="Blue Angel comic page" />
+      <div id="pageTitle" class="page-title"></div>
+    </div>
+  </main>
+
+  <footer>
+    <span class="hint">Use ← / → keys or click the buttons.</span>
+    <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
+  </footer>
+
+  <script>
+    // These filenames match the GitHub root folder shown in your screenshot.
+    // Keep index.html in the same folder as these image files.
+    const pages = [
+      { title: "Cover", file: "New cover.png" },
+      { title: "Inside Title", file: "01_Inside_Title.png" },
+      { title: "Page 1", file: "Page1_Polished.png" },
+      { title: "Page 2", file: "Page2_Polished.png" },
+      { title: "Page 3", file: "Page3_Polished.png" },
+      { title: "Page 4", file: "Page4_Polished.png" },
+      { title: "Page 5", file: "page5_Polished.png" },
+      { title: "Page 6", file: "page6_Polished.png" },
+      { title: "Page 7", file: "Page7_Polished.png" },
+      { title: "Page 8", file: "Page8_Polished.png" },
+      { title: "Page 9", file: "Page9_Polished.png" },
+      { title: "Page 10", file: "Page10_Polished.png" },
+      { title: "End Card", file: "12_End_Card.png" }
+    ];
+
+    let current = 0;
+
+    const img = document.getElementById("comicPage");
+    const counter = document.getElementById("counter");
+    const pageTitle = document.getElementById("pageTitle");
+    const progressBar = document.getElementById("progressBar");
+
+    const firstBtn = document.getElementById("firstBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const lastBtn = document.getElementById("lastBtn");
+
+    function updatePage() {
+      const page = pages[current];
+      img.src = encodeURI(page.file);
+      img.alt = `Blue Angel — ${page.title}`;
+      counter.textContent = `${page.title} (${current + 1} / ${pages.length})`;
+      pageTitle.textContent = page.title;
+
+      firstBtn.disabled = current === 0;
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === pages.length - 1;
+      lastBtn.disabled = current === pages.length - 1;
+
+      const progress = ((current + 1) / pages.length) * 100;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    function goTo(index) {
+      current = Math.max(0, Math.min(index, pages.length - 1));
+      updatePage();
+    }
+
+    firstBtn.addEventListener("click", () => goTo(0));
+    prevBtn.addEventListener("click", () => goTo(current - 1));
+    nextBtn.addEventListener("click", () => goTo(current + 1));
+    lastBtn.addEventListener("click", () => goTo(pages.length - 1));
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") goTo(current - 1);
+      if (event.key === "ArrowRight" || event.key === " ") {
+        event.preventDefault();
+        goTo(current + 1);
+      }
+      if (event.key === "Home") goTo(0);
+      if (event.key === "End") goTo(pages.length - 1);
+    });
+
+    // Preload neighboring pages for smoother page turns.
+    function preload() {
+      pages.forEach((page) => {
+        const image = new Image();
+        image.src = encodeURI(page.file);
+      });
+    }
+
+    updatePage();
+    preload();
+  </script>
 </body>
 </html>
